@@ -1,0 +1,57 @@
+#include <GL/glut.h>
+
+GLfloat angle = 0.0f; // 회전 각도
+
+void initGL() {
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 검은색 배경
+    glClearDepth(1.0f); // 깊이 버퍼 설정
+    glEnable(GL_DEPTH_TEST); // 깊이 테스트 활성화
+    glDepthFunc(GL_LEQUAL); // 어떤 픽셀을 그릴지 결정
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 화면 지우기
+
+    glMatrixMode(GL_MODELVIEW); // 모델뷰 매트릭스 모드로 변경
+    glLoadIdentity(); // 현재 매트릭스를 단위행렬로 초기화
+
+    glTranslatef(0.0f, 0.0f, -5.0f); // 주전자를 z축으로 -5만큼 이동
+    glRotatef(angle, 1.0f, 1.0f, 1.0f); // 주전자를 회전
+
+    // 주전자 그리기
+    glutWireTeapot(1.0f);
+
+    glutSwapBuffers(); // 화면에 그리기
+}
+
+void reshape(int width, int height) {
+    glViewport(0, 0, width, height); // 뷰포트 설정
+    glMatrixMode(GL_PROJECTION); // 투영 매트릭스 모드로 변경
+    glLoadIdentity(); // 현재 매트릭스를 단위행렬로 초기화
+    gluPerspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f); // 투영 행렬 설정
+}
+
+void timer(int value) {
+    angle += 2.0f; // 각도를 증가시켜 회전 속도 조절
+    glutPostRedisplay(); // 화면 재그리기 요청
+    glutTimerFunc(16, timer, 0); // 16ms마다 타이머 호출
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv); // GLUT 초기화
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); // 디스플레이 모드 설정
+    glutInitWindowSize(800, 600); // 윈도우 크기 설정
+    glutInitWindowPosition(100, 100); // 윈도우 위치 설정
+    glutCreateWindow("Rotating Teapot"); // 윈도우 생성
+
+    glutDisplayFunc(display); // 디스플레이 콜백 함수 등록
+    glutReshapeFunc(reshape); // 리셰이프 콜백 함수 등록
+
+    initGL(); // OpenGL 초기화
+
+    glutTimerFunc(0, timer, 0); // 타이머 함수 등록
+
+    glutMainLoop(); // GLUT 이벤트 루프 진입
+
+    return 0;
+}
